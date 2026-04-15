@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from typing import Optional
 import uuid
 
 from fastapi import FastAPI, HTTPException, status
@@ -16,14 +15,14 @@ agency_routes_index: dict[str, list[str]] = {}  # agency_id -> list of route_ids
 class CreateAgencyRequest(BaseModel):
     name: str
     region: str
-    contact_email: str
+    contact_email: EmailStr
 
 
 class AgencyResponse(BaseModel):
     id: str
     name: str
     region: str
-    contact_email: str
+    contact_email: EmailStr
     created_at: str
 
 
