@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  auth:
+    build: ./services/auth
+    ports:
+      - "8001:8001"
+    env_file: .env
+    volumes:
+      - ./services/auth/data:/app/data
+    restart: unless-stopped
+
+  route:
+    build: ./services/route
+    ports:
+      - "8002:8002"
+    env_file: .env
+    volumes:
+      - ./services/route/data:/app/data
+    restart: unless-stopped
+
+  ticket:
+    build: ./services/ticket
+    ports:
+      - "8003:8003"
+    env_file: .env
+    volumes:
+      - ./services/ticket/data:/app/data
+    restart: unless-stopped
+
+  payment:
+    build: ./services/payment
+    ports:
+      - "8004:8004"
+    env_file: .env
+    volumes:
+      - ./services/payment/data:/app/data
+    restart: unless-stopped
+
+  notification:
+    build: ./services/notification
+    ports:
+      - "8005:8005"
+    env_file: .env
+    volumes:
+      - ./services/notification/data:/app/data
+    restart: unless-stopped
