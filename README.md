@@ -91,4 +91,4 @@ Before contributing, please review the [GitHub Flow](https://docs.github.com/en/
 
 ## License
 
-This project is licensed under the [MIT License](./LICENSE).
+This project is licensed under the [MIT License](https://github.com/ramanlameika/OpenTransit/blob/main/LICENSE).
