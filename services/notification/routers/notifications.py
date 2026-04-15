@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/notifications", tags=["notifications"])
 
 @router.post("", response_model=NotificationOut, status_code=status.HTTP_201_CREATED)
 def create_notification(notif_in: NotificationCreate, db: Session = Depends(get_db)):
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     notification = Notification(
         user_id=notif_in.user_id,
         channel=notif_in.channel,

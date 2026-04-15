@@ -1,5 +1,5 @@
 import secrets
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -19,7 +19,7 @@ def create_payment(payment_in: PaymentCreate, db: Session = Depends(get_db)):
         currency=payment_in.currency,
         status=PaymentStatus.completed,
         gateway_ref=secrets.token_hex(16),
-        updated_at=datetime.utcnow(),
+        updated_at=datetime.now(timezone.utc),
     )
     db.add(payment)
     db.commit()
@@ -55,9 +55,9 @@ def refund_payment(payment_id: str, db: Session = Depends(get_db)):
     if not payment:
         raise HTTPException(status_code=404, detail="Payment not found")
     if payment.status != PaymentStatus.completed:
-        raise HTTPException(status_code=400, detail=f"Cannot refund payment with status {payment.status}")
+        raise HTTPException(status_code=400, detail="Payment cannot be refunded")
     payment.status = PaymentStatus.refunded
-    payment.updated_at = datetime.utcnow()
+    payment.updated_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(payment)
     return payment

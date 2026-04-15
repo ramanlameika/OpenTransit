@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 from sqlalchemy import String, DateTime, Numeric, Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column
@@ -24,6 +24,6 @@ class Ticket(Base):
     status: Mapped[str] = mapped_column(SAEnum(TicketStatus), nullable=False, default=TicketStatus.active)
     fare: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     qr_code: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    issued_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.utcnow())
+    issued_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     used_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)

@@ -76,17 +76,16 @@ Security is a first-class concern for a transit ticketing system that handles pe
 
 ### Authentication & Authorization
 
-- JWT tokens are signed with RS256 (asymmetric keys); private keys are never stored in the repository.
-- Tokens have short expiry times (15 minutes for access tokens, 7 days for refresh tokens).
-- Role-based access control (RBAC) enforces least-privilege access across all services.
-- Passwords are hashed with bcrypt (cost factor ≥ 12).
+- JWT tokens are signed with **HS256** using a `SECRET_KEY` environment variable that must be set explicitly — the service will refuse to start without it.
+- Access tokens expire after **30 minutes**. Re-authentication obtains a new token.
+- Role-based access control (RBAC) is enforced via the token payload (`role` claim).
+- Passwords are hashed with bcrypt at a fixed cost factor of **12 rounds** (configured explicitly in `passlib`).
 
 ### Data Protection
 
-- All data in transit is encrypted via TLS 1.2+.
-- Sensitive fields (payment card data, government IDs) are encrypted at rest using AES-256.
+- All data in transit should be encrypted via TLS 1.2+ (terminate TLS at your load balancer or reverse proxy).
 - The system is designed for GDPR compliance: users can request data export and deletion.
-- PCI-DSS scoping is minimized by delegating card processing to a certified payment gateway; raw card data never touches OpenTransit services.
+- Payment processing is delegated to an external gateway; this service stores only a `gateway_ref` token and never handles raw card data.
 
 ### Input Validation & Injection Prevention
 

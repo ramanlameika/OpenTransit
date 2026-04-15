@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import String, DateTime, Text, Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column
 from database import Base
@@ -27,5 +27,5 @@ class Notification(Base):
     subject: Mapped[str] = mapped_column(String(512), nullable=False)
     body: Mapped[str] = mapped_column(Text, nullable=False)
     status: Mapped[str] = mapped_column(SAEnum(NotificationStatus), nullable=False, default=NotificationStatus.pending)
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.utcnow())
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
     sent_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)

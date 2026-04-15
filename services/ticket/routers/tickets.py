@@ -1,5 +1,5 @@
 import secrets
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -12,7 +12,7 @@ router = APIRouter(prefix="/tickets", tags=["tickets"])
 
 @router.post("", response_model=TicketOut, status_code=status.HTTP_201_CREATED)
 def issue_ticket(ticket_in: TicketCreate, db: Session = Depends(get_db)):
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     ticket = Ticket(
         user_id=ticket_in.user_id,
         route_id=ticket_in.route_id,
@@ -56,13 +56,13 @@ def validate_ticket(ticket_id: str, db: Session = Depends(get_db)):
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
     if ticket.status != TicketStatus.active:
-        raise HTTPException(status_code=400, detail=f"Ticket cannot be validated: status is {ticket.status}")
-    if datetime.utcnow() > ticket.expires_at:
+        raise HTTPException(status_code=400, detail="Ticket cannot be validated")
+    if datetime.now(timezone.utc) > ticket.expires_at.replace(tzinfo=timezone.utc):
         ticket.status = TicketStatus.expired
         db.commit()
         raise HTTPException(status_code=400, detail="Ticket has expired")
     ticket.status = TicketStatus.used
-    ticket.used_at = datetime.utcnow()
+    ticket.used_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(ticket)
     return ticket
@@ -74,7 +74,7 @@ def cancel_ticket(ticket_id: str, db: Session = Depends(get_db)):
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
     if ticket.status not in (TicketStatus.pending, TicketStatus.active):
-        raise HTTPException(status_code=400, detail=f"Cannot cancel ticket with status {ticket.status}")
+        raise HTTPException(status_code=400, detail="Ticket cannot be cancelled")
     ticket.status = TicketStatus.cancelled
     db.commit()
     db.refresh(ticket)

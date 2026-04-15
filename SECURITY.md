@@ -51,7 +51,7 @@ Debug mode, verbose error responses, and default credentials are disabled out of
 |---|---|
 | Payment data | Raw card data is never stored; all payment processing is delegated to a PCI-DSS certified gateway. |
 | Personal data | The system is designed for GDPR compliance. Users can request data export and deletion via the API. |
-| Transit fare evasion | Ticket validation includes cryptographic signatures to prevent ticket forgery and replay attacks. |
+| Transit fare evasion | Each ticket carries a unique, cryptographically random `qr_code` token generated with `secrets.token_hex`. Ticket validation is idempotent and one-time: a ticket transitions to `used` on first validation and subsequent attempts are rejected. |
 
 ## Responsible Disclosure Hall of Fame
 

@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 from sqlalchemy import String, DateTime, Numeric, Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column
@@ -24,5 +24,5 @@ class Payment(Base):
     currency: Mapped[str] = mapped_column(String(10), nullable=False, default="USD")
     status: Mapped[str] = mapped_column(SAEnum(PaymentStatus), nullable=False, default=PaymentStatus.pending)
     gateway_ref: Mapped[str] = mapped_column(String(255), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.utcnow())
-    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.utcnow(), onupdate=lambda: datetime.utcnow())
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
