@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 import uuid
@@ -60,7 +60,7 @@ def create_ticket(body: CreateTicketRequest):
         "passenger_id": body.passenger_id,
         "ticket_type": body.ticket_type,
         "status": TicketStatus.active,
-        "created_at": datetime.utcnow().isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
         "validated_at": None,
     }
     tickets_db[ticket["id"]] = ticket
@@ -86,5 +86,5 @@ def validate_ticket(ticket_id: str):
             detail=f"Ticket cannot be validated (status: {ticket['status']})",
         )
     ticket["status"] = TicketStatus.validated
-    ticket["validated_at"] = datetime.utcnow().isoformat()
+    ticket["validated_at"] = datetime.now(timezone.utc).isoformat()
     return ticket

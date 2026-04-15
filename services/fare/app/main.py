@@ -1,10 +1,10 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 import uuid
 
 from fastapi import FastAPI, HTTPException, status
-from pydantic import BaseModel, condecimal
+from pydantic import BaseModel
 
 app = FastAPI(title="Fare Service", version="1.0.0")
 
@@ -56,7 +56,7 @@ def create_fare(body: CreateFareRequest):
         "route_id": body.route_id,
         "fare_type": body.fare_type,
         "amount": body.amount,
-        "created_at": datetime.utcnow().isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
     }
     fares_db[fare["id"]] = fare
     route_fares_index.setdefault(body.route_id, []).append(fare["id"])

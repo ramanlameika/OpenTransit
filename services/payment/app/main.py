@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 import uuid
@@ -56,7 +56,7 @@ def create_payment(body: CreatePaymentRequest):
         "amount": body.amount,
         "method": body.method,
         "status": PaymentStatus.completed,
-        "created_at": datetime.utcnow().isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
         "refunded_at": None,
     }
     payments_db[payment["id"]] = payment
@@ -84,5 +84,5 @@ def refund_payment(payment_id: str):
             detail=f"Cannot refund payment with status: {payment['status']}",
         )
     payment["status"] = PaymentStatus.refunded
-    payment["refunded_at"] = datetime.utcnow().isoformat()
+    payment["refunded_at"] = datetime.now(timezone.utc).isoformat()
     return payment

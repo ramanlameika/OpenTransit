@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 import uuid
 
@@ -59,7 +59,7 @@ def create_agency(body: CreateAgencyRequest):
         "name": body.name,
         "region": body.region,
         "contact_email": body.contact_email,
-        "created_at": datetime.utcnow().isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
     }
     agencies_db[agency["id"]] = agency
     agency_routes_index[agency["id"]] = []

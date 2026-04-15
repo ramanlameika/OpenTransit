@@ -1,16 +1,17 @@
-from datetime import datetime, timedelta
+import os
+from datetime import datetime, timezone, timedelta
 from typing import Optional
 import uuid
 
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, field_validator
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 app = FastAPI(title="Auth Service", version="1.0.0")
 
-SECRET_KEY = "opentransit-secret-key-change-in-production"
+SECRET_KEY = os.getenv("AUTH_SECRET_KEY", "opentransit-dev-secret-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
@@ -61,7 +62,7 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode["exp"] = expire
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -92,7 +93,7 @@ def register(body: RegisterRequest):
         "email": body.email,
         "full_name": body.full_name,
         "hashed_password": hash_password(body.password),
-        "created_at": datetime.utcnow().isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
     }
     users_db[body.email] = user
     return UserResponse(**{k: v for k, v in user.items() if k != "hashed_password"})
