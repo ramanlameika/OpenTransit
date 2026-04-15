@@ -57,7 +57,8 @@ def validate_ticket(ticket_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Ticket not found")
     if ticket.status != TicketStatus.active:
         raise HTTPException(status_code=400, detail="Ticket cannot be validated")
-    if datetime.now(timezone.utc) > ticket.expires_at.replace(tzinfo=timezone.utc):
+    expires_at = ticket.expires_at if ticket.expires_at.tzinfo else ticket.expires_at.replace(tzinfo=timezone.utc)
+    if datetime.now(timezone.utc) > expires_at:
         ticket.status = TicketStatus.expired
         db.commit()
         raise HTTPException(status_code=400, detail="Ticket has expired")
